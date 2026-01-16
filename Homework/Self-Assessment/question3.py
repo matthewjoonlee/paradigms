@@ -1,4 +1,6 @@
 def tree_to_text(tree, root_node):
+    # your implementation here
+    # your function will return a string!
     # Split node number from value or operator
     def node_value(label):
         return label.split("_", 1)[1]
