@@ -1,0 +1,3 @@
+0 == "0" is true because JS converts the string into a number because one side is a string and the other is a number.
+0 == [] is true because JS converts the array object into an int which yields 0 == 0 which is true.
+"0" == [] is false because JS converts the array object into a string which yields "0" == "" whcih is false. 
