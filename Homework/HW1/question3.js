@@ -32,6 +32,7 @@ function enumerate(i,j) {
     return output;
 }
 
+// test cases
 function main() {
     const tests = [
         { i: 1, j: 2 },

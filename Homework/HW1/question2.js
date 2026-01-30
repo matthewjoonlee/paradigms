@@ -21,6 +21,7 @@ function find(nums) {
     return max_33;
 }
 
+// test cases
 function main() {
     const tests = [
         [33, 33, 30, 33, 33, 33],

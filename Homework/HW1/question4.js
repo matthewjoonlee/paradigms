@@ -11,6 +11,7 @@ function reversedSum(num1, num2) {
     return reverseNumber(sum);
 }
 
+// test cases
 function main() {
     const tests = [
         { num1: "24", num2: 1 },
