@@ -1,4 +1,5 @@
 def text_to_tree(expression: str) -> list:
+    # ... solution here ...
     # convert the string into tokens (numbers and operators).
     tokens = []
     i = 0
