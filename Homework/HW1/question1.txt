@@ -1,0 +1,11 @@
+Q1.1
+Global scopes: let a = 1, var c = 20
+Function scopes: var b = 2
+Block scopes: let c = 3, let d = 10
+
+Q1.2
+The first output comes from console.log(a + b + c). Because a = 1 (global), b = 2 (function), and c = 3 (if block), the output will be 6 and works because it is in the if block.
+The second output comes from console.log(a + b). Because a = 1 (global) and b = 2(funcion), the output will be 3 and works because it is in the funcion.
+The third output comes from console.log(a), and a = 1 (global) so it correctly prints.
+The fourth output comes from console.log(c), and it looks at the global scope c = 20 instead of the block scope c = 3 so it prints 20.
+The fifth output is an error (Reference error) because the d is block scoped and not accessible. 
