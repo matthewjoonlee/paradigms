@@ -25,6 +25,7 @@ class Defect {
 function loadObjects(){
     const fs = require("fs");
 
+    // CSV parser for comma delimination, trimming whitespace, and handling missing values
     const parseCSV = (text) => {
         const [headerLine, ...dataLines] = text.split(/\r?\n/).filter(Boolean);
         const headers = headerLine.split(",").map((h) => h.trim());
@@ -38,6 +39,7 @@ function loadObjects(){
         });
     };
 
+    // Read a CSV file from the current directory and parse it.
     const readCSV = (filename) =>
         parseCSV(fs.readFileSync(filename, "utf8"));
 
@@ -46,11 +48,13 @@ function loadObjects(){
     const blocksRaw = readCSV("defect_blocks.csv");
     const dependsRaw = readCSV("defect_depends.csv");
 
+    // Map username to real name for lookup when building defects.
     const developerMap = new Map();
     developers.forEach((dev) => {
         developerMap.set(dev.username, dev.real_name);
     });
 
+    // Build Defect objects with bug_id, component, status, resolution, summary, blocks, depends, fixed_by_username, and fixed_by_real_name.
     const defectMap = new Map();
     const defects = defectsRaw.map((row) => {
         const fixedBy = row.fixed_by ?? "";
@@ -69,15 +73,17 @@ function loadObjects(){
         return defect;
     });
 
-    blocksRaw.forEach((row) => {
-        const fromId = Number(row.from_defect_id);
-        const toId = Number(row.to_defect_id);
+    // Create block connections
+    blocksRaw.forEach((entry) => {
+        const fromId = Number(entry.from_defect_id);
+        const toId = Number(entry.to_defect_id);
         if (defectMap.has(fromId)) defectMap.get(fromId).blocks.push(toId);
     });
 
-    dependsRaw.forEach((row) => {
-        const fromId = Number(row.from_defect_id);
-        const toId = Number(row.to_defect_id);
+    // Create depends connections
+    dependsRaw.forEach((entry) => {
+        const fromId = Number(entry.from_defect_id);
+        const toId = Number(entry.to_defect_id);
         if (defectMap.has(fromId)) defectMap.get(fromId).depends.push(toId);
     });
 
@@ -86,18 +92,22 @@ function loadObjects(){
 
 
 function query1(defects){
+    // Count defects that are resolved and fixed
     return defects.filter(
         (d) => d.status === "RESOLVED" && d.resolution === "FIXED"
     ).length;
 }
 
 function query2(defects){
+    // Count defects whose summary includes "buildbot" 
     return defects.filter((d) =>
+        // lowercase to make caseinsensitive, and default to empty string if summary is missing
         (d.summary || "").toLowerCase().includes("buildbot")
     ).length;
 }
 
 function query3(defects){
+    // Percentage of defects status still in backlog
     if (defects.length === 0) return 0;
     const backlog = defects.filter((d) => d.status !== "RESOLVED").length;
     const percent = (backlog / defects.length) * 100;
@@ -105,22 +115,30 @@ function query3(defects){
 }
 
 function query4(defects){
-    const counts = defects.reduce((acc, d) => {
-        acc[d.component] = (acc[d.component] || 0) + 1;
-        return acc;
+    // Count how many defects each component has
+    const counts = defects.reduce((totals, d) => {
+        // Initialize the count for this component if it doesn't exist yet
+        totals[d.component] = (totals[d.component] || 0) + 1;
+        return totals;
     }, {});
 
-    return Object.keys(counts).reduce((best, comp) => {
-        if (best === null) return comp;
+    // Walk through all components to find the highest count
+    return Object.keys(counts).reduce((best, curr) => {
+        // first current
+        if (best === null) return curr;
         const bestCount = counts[best];
-        const compCount = counts[comp];
-        if (compCount > bestCount) return comp;
-        if (compCount === bestCount && comp < best) return comp;
+        const currCount = counts[curr];
+        // Replace best when the current component has more defects
+        if (currCount > bestCount) return curr;
+        // If counts are equal, pick the name that sorts earlier
+        if (currCount === bestCount && curr < best) return curr;
+        // Else, keep the current best
         return best;
     }, null);
 }
 
 function query5(defects){
+    // Developer who fixed the most Documentation defects.
     const counts = defects
         .filter(
             (d) =>
@@ -128,22 +146,31 @@ function query5(defects){
                 d.resolution === "FIXED" &&
                 d.component === "Documentation"
         )
-        .reduce((acc, d) => {
-            acc[d.fixed_by_username] = (acc[d.fixed_by_username] || 0) + 1;
-            return acc;
+        .reduce((totals, d) => {
+            // Count how many documentation defects each developer fixed
+            totals[d.fixed_by_username] = (totals[d.fixed_by_username] || 0) + 1;
+            return totals;
         }, {});
 
     const names = Object.keys(counts);
+    // Nobody fixed documentation defects, return null
     if (names.length === 0) return null;
 
-    return names.sort((a, b) => {
-        const diff = counts[b] - counts[a];
-        if (diff !== 0) return diff;
-        return a.localeCompare(b);
-    })[0];
+    // Find the developer with the largest count, break ties alphabetically.
+    return names.reduce((best, curr) => {
+        // first is best
+        if (best === null) return curr;
+        // Replace best when the current developer fixed more documentation defects
+        if (counts[curr] > counts[best]) return curr;
+        // If tied, prefer alphabetically smaller name.
+        if (counts[curr] === counts[best] && curr < best) return curr;
+        // Else, keep the current best
+        return best;
+    }, null);
 }
 
 function query6(defects){
+    // Detect cycles using DFS
     const graph = new Map(
         defects.map((d) => [d.bug_id, d.blocks.slice()])
     );
@@ -152,18 +179,23 @@ function query6(defects){
     const visited = new Set();
 
     const hasCycleFrom = (node) => {
+        // If we see a node already in the current path, we found a cycle
         if (visiting.has(node)) return true;
+        // If we've fully explored this node, no need to re-check
         if (visited.has(node)) return false;
         visiting.add(node);
         const neighbors = graph.get(node) || [];
         for (let i = 0; i < neighbors.length; i++) {
+            // Recurse through neighbors downstream
             if (hasCycleFrom(neighbors[i])) return true;
         }
+        // backtrack: remove from visiting and add to visited
         visiting.delete(node);
         visited.add(node);
         return false;
     };
 
+    // If at least one returns true, then there is a cycle in the graph
     return defects.some((d) => hasCycleFrom(d.bug_id));
 }
 
