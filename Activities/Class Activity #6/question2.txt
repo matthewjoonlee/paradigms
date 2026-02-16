@@ -1,0 +1,11 @@
+Output:
+0
+1
+2
+
+Explanation:
+Compared to question1 that uses var to create a single function scoped variable, let creates a new block scoped variable for each iteration of the loop. 
+This means each callback gets its own separate copy (binding) of i.
+Even though setTimeout still executes after the loop finishes, each callback references a different i from its own iteration because it is block scoped.
+This is why it prints 0, 1, 2.
+
