@@ -1,0 +1,9 @@
+Output:
+3
+3
+3
+
+Explanation:
+var creates a single function scoped variable that is shared across all iterations of the loop. 
+Since setTimeout executes after the loop finishes (because JS continues running and does not wait), all the callbacks reference the same variable i.
+By the time the callbacks run, the loop has completed and i has been incremented to 3, so console.log(i) prints 3 three times.
