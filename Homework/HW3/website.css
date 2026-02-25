@@ -1,0 +1,32 @@
+/* page base */
+body {
+    background-color: #f8f9fa;
+    font-family: Arial, sans-serif;
+}
+
+/* shared card style */
+.simple-card {
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* home links */
+#profile-links {
+    margin-top: 16px;
+    font-weight: 600;
+}
+
+.dancing-dog {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 42px;
+    animation: dog-dance 1s infinite ease-in-out;
+}
+
+@keyframes dog-dance {
+    0% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translateY(-8px) rotate(-10deg); }
+    50% { transform: translateY(0) rotate(0deg); }
+    75% { transform: translateY(-8px) rotate(10deg); }
+    100% { transform: translateY(0) rotate(0deg); }
+}
