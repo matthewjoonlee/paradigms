@@ -36,7 +36,7 @@ class WordleGame:
             file.write(self.answer)
 
     # Prompt input until user provides a 5 letter word from Word Bank
-    def get_valid_guess(self):
+    def input_guess(self):
         while True:
             guess = input("Enter 5-letter word: ").strip().upper()
 
@@ -73,7 +73,7 @@ class WordleGame:
     def play(self):
         attempts = 0
         while attempts < self.max_attempts:
-            guess = self.get_valid_guess()
+            guess = self.input_guess()
             attempts += 1
             if guess == self.answer:
                 print(
