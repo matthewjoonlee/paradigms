@@ -1,0 +1,2 @@
+Feature 1: Use DetailView because it is designed to display a single item with details like a specific question post. 
+Feature 2: Use ListView because it is designed to display multiple items like listing all the questions. 
