@@ -1,0 +1,4 @@
+In Django, templates are HTML files stored in an app's "templates" folder that are responsibel for the entire user interface. 
+They control the static parts of a webpage, including the HTML the user sees, but they can also include Python-like template syntax for dynamic content such as variables, loops, and conditionals. 
+Django uses "{{ ... }}" to display dynamic values and "{% ... %}" for control structures. 
+These template instructions are processed to produce the final HTML, and that finished HTML is what gets sent to the client, not the template code.
