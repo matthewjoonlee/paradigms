@@ -1,6 +1,7 @@
 from django.db import models
 
 
+#Blog post model with title, content, author name, and publication date
 class Post(models.Model):
     title = models.CharField(max_length=200)
     content = models.TextField()
